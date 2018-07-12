@@ -41,53 +41,17 @@ public class IterativeServer {
 			System.out.println("Client connected");
 			
 			
+			new ServerThread(socket).start();
 			
-			
-			do 
-			{
-				InputStream input = socket.getInputStream();
-				BufferedReader br = new BufferedReader(new InputStreamReader(input));
-				StringBuilder sb = new StringBuilder();
-				
-				OutputStream output = socket.getOutputStream();
-				PrintWriter writer = new PrintWriter(output, true);
-				
-				writer.println("Connected to Server " + socket.getRemoteSocketAddress());
-				writer.flush();
-				
-				String text = " ";
-				String cmd = " ";
-				
-			
-			
-			sb.append(br.readLine());
-			
-			text = sb.toString();
-			
-			
-			
-			if(text.equals("exit"))
-			socket.close();
-			
-			
-			//System.out.println("Troubleshoot: " + RunCommand(text));
-			
-			cmd = RunCommand(text);
-			
-			//System.out.println("Troubleshoot cmd: " + cmd);
-			
-			writer.println(cmd);
-			
-			
-			
-			}while(socket.isClosed() == false);
+			System.out.println("Number of clients connected: " + ServerThread.activeCount() + "\n");
 			
 		}
+			
 	}
 	
 	catch(IOException e)
 	{
-		throw new IOException("Error!");
+		throw new IOException("Closed! Server is listening on port: " + port);
 	}
 
 	}//end main
@@ -129,7 +93,7 @@ public class IterativeServer {
 	        
 	    }
 	    catch (IOException e) {
-	        System.out.println("Error! ");   
+	        System.out.println("Command Error!");   
 	        return null;
 	    }
 	    
@@ -142,9 +106,73 @@ public class IterativeServer {
 	  return sb.toString();
 	}
 //==================================================
+	static public class ServerThread extends Thread {
+	    private Socket socket;
+	 
+	    public ServerThread(Socket socket) {
+	        this.socket = socket;
+	    } 
+
+public void run() {
+	
+	try
+	{
+	        do 
+			{
+				InputStream input = socket.getInputStream();
+				BufferedReader br = new BufferedReader(new InputStreamReader(input));
+				StringBuilder sb = new StringBuilder();
+				
+				OutputStream output = socket.getOutputStream();
+				PrintWriter writer = new PrintWriter(output, true);
+				
+				writer.println("Connected to Server " + socket.getRemoteSocketAddress());
+				writer.flush();
+				
+				String text = " ";
+				String cmd = " ";
+				
+			
+			
+			sb.append(br.readLine());
+			
+			text = sb.toString();
+			
+			
+			
+			if(text.equals("exit"))
+			socket.close();
+			
+			if(text.equals(null))
+				break;
+			
+			
+			//System.out.println("Troubleshoot: " + RunCommand(text));
+			
+			cmd = RunCommand(text);
+			
+			//System.out.println("Troubleshoot cmd: " + cmd);
+			
+			writer.println(cmd);
+			
+			
+			
+			}while(socket.isClosed() == false);
+			
+		   
+	        
+	}
+	
+	catch (IOException ex)
+	{
+		System.out.println("oops all berries");
+	}
 
 	
+}
 }//End program
+	
+}
 	
 
 
