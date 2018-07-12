@@ -17,14 +17,18 @@ public class IterativeClient {
 		String hostname = args[0];
 		int port = Integer.parseInt(args[1]);
 		
+		
+		
+
+	
 		try 
 		{
 			Socket socket = new Socket(hostname, port); //Creates a socket and connects to a specified host name and port
 													   //When testing on a local machine, the hostname will be "localhost"
 													   //When running program on specified Client server, the hostname will be "192.168.100.88" and port will be 22
-			
+		
 			new ServerThread(socket).start(); //Start new socket, listening for additional clients. Client cap is defaulted to 50.
-			
+		
 		}
 		
 		catch (UnknownHostException ex) {
@@ -64,9 +68,13 @@ public class IterativeClient {
 	            		
 					text = keyboard.nextLine();
 					writer.println(text);
+					long start = System.currentTimeMillis();
 					
 					
-					System.out.println(br.readLine() + "\n");
+					System.out.println(br.readLine());
+					long end = System.currentTimeMillis();
+					
+					System.out.println("Response time: " + (end - start) + " m/s \n");
 					
 				
 					
