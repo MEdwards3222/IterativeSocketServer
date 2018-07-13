@@ -1,4 +1,5 @@
 import java.net.*;
+import java.util.ArrayList;
 import java.util.Scanner;
 import java.io.*;
 
@@ -12,6 +13,9 @@ public class IterativeClient {
 	   //When testing on a local machine, the hostname will be "localhost"
 	   //When running program on specified Client server, the hostname will be "192.168.100.88" and port will be 22
 	static int i = 0;
+	static ArrayList<Long> ToTSum = new ArrayList<>();
+	static long sum = 0;
+	static int amount = 0;
 
 	public static void main(String[] args) {
 		if(args.length < 2)
@@ -20,7 +24,7 @@ public class IterativeClient {
 		int option = 1;
 		String hostname = args[0];
 		int port = Integer.parseInt(args[1]);
-		int amount = 0;
+		
 		StringBuilder sb = new StringBuilder();
 		String text = " ";
 		Socket[] socketArray = new Socket[50];//Creates a socket and connects to a specified host name and port
@@ -53,7 +57,10 @@ public class IterativeClient {
 			new ServerThread(socketArray[i], text, hostname, port, session).start(); //Start new socket, listening for additional clients. Client cap is defaulted to 50.
 			
 		}
-		}
+		
+		
+		
+		}//end try
 		
 		catch (UnknownHostException ex) {
 			 
@@ -96,6 +103,7 @@ public class IterativeClient {
 	 
 	            OutputStream output = socket.getOutputStream();
 	            PrintWriter writer = new PrintWriter(output, true);
+	            double avg = 0.0;
 	 
 	 
 	          
@@ -113,13 +121,24 @@ public class IterativeClient {
 					
 					System.out.println("For client #" + session + ": \n" + br.readLine() + "\n");
 					long end = System.currentTimeMillis();
-					System.out.println("Response time for client " + session + ": " + (end - start) + " m/s \n");
+					Long total = (end - start);
+					sum = sum + total;
+					avg = (sum / amount);
+					System.out.println( "----------------------------------------------------- \n" +
+										"Response time for client " + session + ": " + total + " m/s \n" +
+										"Total ToT for "+session+ " connections: " +sum + " m/s \n" +
+										"Average ToT "+session+ " connections: " +avg + " m/s \n" +
+										"----------------------------------------------------- \n");
 					
+				
+				
 				
 					
 	          
 	            
 	            System.out.println("Terminating Connection for client "+session+  "! Good Bye!");
+	            
+	           
 	            socket.close();
 	            
 	        } 
@@ -127,7 +146,8 @@ public class IterativeClient {
 	        catch (IOException ex) {
 	            System.out.println("Server exception: " + ex.getMessage());
 	            ex.printStackTrace();
-	        }
-	    }
-	}
+	        } //end catch
+	    }//end run
+	}//end Server Thread
+	
 }
