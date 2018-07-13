@@ -8,27 +8,51 @@ import java.io.*;
 public class IterativeClient {
 	
 	static Scanner keyboard = new Scanner(System.in);
+	static Socket[] socketArray = new Socket[50];//Creates a socket and connects to a specified host name and port
+	   //When testing on a local machine, the hostname will be "localhost"
+	   //When running program on specified Client server, the hostname will be "192.168.100.88" and port will be 22
+	static int i = 0;
 
 	public static void main(String[] args) {
 		if(args.length < 2)
 			return;
 		
-		
+		int option = 1;
 		String hostname = args[0];
 		int port = Integer.parseInt(args[1]);
+		int amount = 0;
+		StringBuilder sb = new StringBuilder();
+		String text = " ";
+		Socket[] socketArray = new Socket[50];//Creates a socket and connects to a specified host name and port
+		   //When testing on a local machine, the hostname will be "localhost"
+		   //When running program on specified Client server, the hostname will be "192.168.100.88" and port will be 22
 		
+		System.out.println("Please specify the amount of connections up to 50: \n");
 		
+		amount = keyboard.nextInt();
 		
+		System.out.println("Please specify the command you wish to use: \n" + 
+							"- Date and Time: date \n" +
+							"- Uptime: uptime \n" +
+							"- Memory Use: free \n" +
+							"- Netstat: netstat \n" +
+							"- Current Users: who OR users \n" +
+							"- Running Processes: ps \n");
+		text = keyboard.next();
 
 	
 		try 
 		{
-			Socket socket = new Socket(hostname, port); //Creates a socket and connects to a specified host name and port
-													   //When testing on a local machine, the hostname will be "localhost"
-													   //When running program on specified Client server, the hostname will be "192.168.100.88" and port will be 22
-		
-			new ServerThread(socket).start(); //Start new socket, listening for additional clients. Client cap is defaulted to 50.
-		
+			
+		for(i = 0; i < amount ; i++)
+		{
+			Socket socket = new Socket(hostname, port);
+			socketArray[i]  = socket;
+			int session = i + 1;
+			
+			new ServerThread(socketArray[i], text, hostname, port, session).start(); //Start new socket, listening for additional clients. Client cap is defaulted to 50.
+			
+		}
 		}
 		
 		catch (UnknownHostException ex) {
@@ -38,18 +62,35 @@ public class IterativeClient {
         } catch (IOException ex) {
  
             System.out.println("I/O error: " + ex.getMessage());
-        }
-
+        } 
+		
+		
+		
 	}
 	static public class ServerThread extends Thread {
+	   
+	    private String text;
+	    private String hostname;
+	    private int port;
 	    private Socket socket;
+	    private int session;
 	 
-	    public ServerThread(Socket socket) {
+	    public ServerThread(Socket socket, String text, String hostname, int port, int session) {
+	 
+	        this.text = text;
+	        this.hostname = hostname;
+	        this.port = port;
 	        this.socket = socket;
+	        this.session = session;
 	    }
+	    
+	 
 	 
 	    public void run() {
+	    	
 	        try {
+	         	
+	        	
 	            InputStream input = socket.getInputStream();
 	            BufferedReader br = new BufferedReader(new InputStreamReader(input));
 	 
@@ -57,30 +98,28 @@ public class IterativeClient {
 	            PrintWriter writer = new PrintWriter(output, true);
 	 
 	 
-	            String text;
-	            
+	          
 	           
 	 
-	            do {
+	            
 	            	System.out.println(br.readLine());
-	            	System.out.println("Please input a command (type 'exit' to disconnect): ");
+	
 	            	
 	            		
-					text = keyboard.nextLine();
+					
 					writer.println(text);
 					long start = System.currentTimeMillis();
+					System.out.println();
 					
-					
-					System.out.println(br.readLine());
+					System.out.println("For client #" + session + ": \n" + br.readLine() + "\n");
 					long end = System.currentTimeMillis();
-					
-					System.out.println("Response time: " + (end - start) + " m/s \n");
+					System.out.println("Response time for client " + session + ": " + (end - start) + " m/s \n");
 					
 				
 					
-	            } while(!text.equals("exit"));
+	          
 	            
-	            System.out.println("Terminating Connection. Good Bye!");
+	            System.out.println("Terminating Connection for client "+session+  "! Good Bye!");
 	            socket.close();
 	            
 	        } 
