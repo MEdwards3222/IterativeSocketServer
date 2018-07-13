@@ -80,7 +80,6 @@ public class IterativeServer {
 	        // read the output from the command
 	        
 	        
-	        System.out.println("Here is the standard output of the command:\n");
 	        while ((s = stdInput.readLine()) != null) {
 	            sb.append(s);
 	            
@@ -117,8 +116,7 @@ public void run() {
 	
 	try
 	{
-	        do 
-			{
+	      
 				InputStream input = socket.getInputStream();
 				BufferedReader br = new BufferedReader(new InputStreamReader(input));
 				StringBuilder sb = new StringBuilder();
@@ -140,11 +138,10 @@ public void run() {
 			
 			
 			
-			if(text.equals("exit"))
-			socket.close();
 			
-			if(text.equals(null))
-				break;
+			
+			
+	
 			
 			
 			//System.out.println("Troubleshoot: " + RunCommand(text));
@@ -157,15 +154,16 @@ public void run() {
 			
 			
 			
-			}while(socket.isClosed() == false);
+		
 			
-		   
+			socket.close();
 	        
 	}
 	
+	
 	catch (IOException ex)
 	{
-		System.out.println("oops all berries");
+		System.out.println("Error");
 	}
 
 	
